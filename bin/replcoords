@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+import re
+try:
+    from openbabel import openbabel as ob
+except ImportError:
+    import openbabel as ob
+
+obconv = ob.OBConversion()
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description="Replaces coordinates of a gaussian "
+    "job file with the coordinates of the input file",
+                            formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('input',
+                        help='Input file with the new coordinates (e.g. *.xyz or *.log)')
+    parser.add_argument('target',
+                        help='*.com or *.gjf for which the coordinates are replaced')
+    args = parser.parse_args()
+
+    obmol = ob.OBMol()
+    obconv.SetInFormat(obconv.FormatFromExt(args.input))
+    obconv.ReadFile(obmol, args.input)
+    obconv.SetOutFormat('xyz')
+    xyz_data = obconv.WriteString(obmol)
+    # Remove the first lines
+    newline_pattern = re.compile('\n')
+    newline_iter = newline_pattern.finditer(xyz_data)
+    next(newline_iter)
+    start = 1 + next(newline_iter).start()
+    xyz_data = xyz_data[start:]
+    
+    with open(args.target, 'r') as stream:
+        gjf_lines = stream.readlines()
+    
+    with open(args.target, 'w') as stream:
+        state_pattern = re.compile('[\-0-9]+ +([\-0-9]+|\{[\-0-9]+,[\-0-9]+\})$')
+        coords_section = False
+        for line in gjf_lines:
+            if state_pattern.match(line):
+                stream.write(line)
+                coords_section = True
+            elif coords_section:
+                # Replace the coordinates
+                if line.strip():
+                    continue
+                else:
+                    stream.write(xyz_data)
+                    stream.write(line)
+                    coords_section = False
+            else:
+                stream.write(line)
+

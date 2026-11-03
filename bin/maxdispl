@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+if [[ $# -ge 1 ]]; then
+    grep 'Maximum Displacement' $@ | nl | sort -rk 3
+    exit 0
+else
+    echo 'Error: No log file given' >&2
+    exit 1
+fi
+

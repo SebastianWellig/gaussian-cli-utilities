@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+import sys
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+try:
+    from openbabel import openbabel as ob
+except ImportError:
+    import openbabel as ob
+
+obconv = ob.OBConversion()
+
+
+def distort_with_normal_mode(obmol, i_mode, scale_factor=1.0):
+    vib_data = ob.toVibrationData(obmol.GetData('VibrationData'))
+    if vib_data is None:
+        raise AttributeError('Failed to read fequency data')
+    displacements = vib_data.GetLx()[i_mode-1]
+    for atom, displacement in zip(ob.OBMolAtomIter(obmol),
+                                  displacements):
+        pos = atom.GetVector()
+        pos.SetX(pos.GetX() + scale_factor * displacement.GetX())
+        pos.SetY(pos.GetY() + scale_factor * displacement.GetY())
+        pos.SetZ(pos.GetZ() + scale_factor * displacement.GetZ())
+        atom.SetVector(pos)
+    return vib_data.GetFrequencies()[i_mode-1]
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description="Distorts coordinates with the i'th "
+                                        "normal mode",
+                            formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('input_file',
+                        help='Input file with coordinates and frequencies '
+                             '(e.g. Gaussian *.log)')
+    parser.add_argument('-o', '--output',
+                        help='Output file with the displaced coordinates. '
+                             'Prints as xyz to stdout if not specified')
+    parser.add_argument('-s', '--scale', default=0.75, type=float,
+                        help='Scaling factor for the normal mode vector')
+    parser.add_argument('-m', '--mode', default=1, type=int,
+                        help='Index of the normal mode (starts from 1). The '
+                             'modes are sorted by ascanding order of the '
+                             'corresponding frequencies')
+    args = parser.parse_args()
+
+    obmol = ob.OBMol()
+    obconv.SetInFormat(obconv.FormatFromExt(args.input_file))
+    obconv.ReadFile(obmol, args.input_file)
+
+    vib_freq = distort_with_normal_mode(obmol, args.mode, args.scale)
+
+    print('Distorted coordinates along the', vib_freq, 'Hz normal mode.',
+          file=sys.stderr)
+
+    if args.output is None:
+        obconv.SetOutFormat(obconv.FormatFromExt('xyz'))
+        print(obconv.WriteString(obmol))
+    else:
+        obconv.SetOutFormat(obconv.FormatFromExt(args.output))
+        obconv.WriteFile(obmol, args.output)

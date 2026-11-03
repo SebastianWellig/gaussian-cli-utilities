@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+from pathlib import Path
+from argparse import ArgumentParser
+
+
+MAX_COORD_NAME_LENGTH = 8
+
+
+def read_internal_coords_block(stream):
+    definitions = {}
+
+    for line in stream:
+        try:
+            _, name, definition, *_ = line.split()
+            definitions[name[:MAX_COORD_NAME_LENGTH]] = definition
+        except ValueError:
+            break
+    else:
+        raise RuntimeError('List of internal coordinates incomplete')
+    
+    return definitions
+
+
+def read_eigenvectors_block(stream):
+    eigs = []
+    while stream:
+        line = stream.readline()
+
+        if not line.startswith('   '):
+            break
+    
+        names = line.split()
+
+        line = stream.readline()
+
+        if not line:
+            break
+
+        values = line.split()[1:]
+        eigs.extend(zip(names, values))
+    
+    return eigs
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description='Prints eigenvectors of TS optimization for each step',
+                            epilog=(
+                                'All internal coordinates are shown by default. '
+                                'If any of -b/-a/-d flags are provided, only the selected types are shown.'
+                            )
+    )
+    parser.add_argument('input', help='Gaussian log file')
+    #parser.add_argument('-n', type=int, default=-1, help='Maximum number of eigenvectors to print')
+    parser.add_argument('-b', action='store_true', help='Include bond lengths')
+    parser.add_argument('-a', action='store_true', help='Include bond angles')
+    parser.add_argument('-d', action='store_true', help='Include dihedrals')
+    args = parser.parse_args()
+
+    def should_print_vector(name):
+        # show all if no option is set
+        if not args.b and not args.a and not args.d:
+            return True
+
+        if not args.b and name[0] == 'B':
+            return False
+
+        if not args.a and name[0] in ['A', 'L']:
+            return False
+
+        if not args.d and name[0] == 'D':
+             return False
+        
+        return True
+
+    with open(args.input, 'r') as stream:
+        for line in stream:
+            if 'Initial Parameters' in line:
+                break
+        else:
+            raise RuntimeError('No internal coordinates found')
+        
+        for _ in range(4):
+            stream.readline()
+
+        definitions = read_internal_coords_block(stream)
+        
+        step = 1
+        
+        for line in stream:
+            if not line.startswith(' Eigenvectors'):
+               continue
+
+            print(end=f'{step:>3}')
+
+            eigs = read_eigenvectors_block(stream)
+            def_line = ''
+            val_line = '   '
+
+            for (name, value) in eigs:
+                definition = definitions[name[:MAX_COORD_NAME_LENGTH]]
+                
+                if should_print_vector(definition):
+                    def_line += f'{definition:>20}'
+                    val_line += f'{value:>20}'
+
+            print(def_line)
+            print(val_line)
+            step += 1
+
