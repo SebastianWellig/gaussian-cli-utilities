@@ -1,8 +1,7 @@
 # Gaussian CLI utilities
 
-[![GitHub Downloads](https://img.shields.io/github/downloads/SebastianWellig/gaussian-cli-utilities/total.svg?label=GitHub%20Dowloads&style=flat-square)](https://github.com/SebastianWellig/gaussian-cli-utilities/releases)
 [![Issues](https://img.shields.io/github/issues-raw/SebastianWellig/gaussian-cli-utilities.svg?label=Issues&style=flat-square)](https://github.com/SebastianWellig/gaussian-cli-utilities/issues)
-[![License](https://img.shields.io/badge/License-GPLv3-orange.svg?style=flat-square)](https://github.com/SebastianWellig/gaussian-cli-utilities/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-orange.svg?style=flat-square)](https://github.com/SebastianWellig/gaussian-cli-utilities/blob/master/LICENSE)
 
 Collection of my personal CLI commands for manipulating and inspecting Gaussian files.
 
