@@ -108,4 +108,4 @@ Example output:
 
 ## License
 
-[MIT License](LICENSE)
+[GNU General Public License, version 2](LICENSE)
