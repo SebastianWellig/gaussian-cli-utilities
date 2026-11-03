@@ -18,10 +18,10 @@ All commands are standalone files and inside the [bin](bin/) directory of this r
 ## Commands
 
 Available commands:
-- [`gmod`](#gmod)
-- [`replcoords`](#replcoords)
-- [`maxdispl`](#maxdispl)
-- [`tseigs`](#tseigs)
+- [`gmod`](#gmod) - Distort coordinates by a normal mode.
+- [`replcoords`](#replcoords) - Replace input file coordinates.
+- [`maxdispl`](#maxdispl) - Print sorted maximum displacements of geometry optimization.
+- [`tseigs`](#tseigs) - Print eigenvectors of transition state optimization.
 
 ### `gmod`
 
