@@ -1,9 +1,25 @@
-#!/usr/bin/env bash
-if [[ $# -ge 1 ]]; then
-    grep 'Maximum Displacement' "$@" | nl | sort -rk 3
-    exit 0
-else
-    echo 'Error: No log file given' >&2
-    exit 1
-fi
+#!/usr/bin/env python3
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description='Prints step number together with Maximum '
+                                        'Displacement lines sorted by decreasing '
+                                        'displacement value.',
+                            formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('log_file',
+                        help='Gaussian log file with geometry optimization.')
+    args = parser.parse_args()
+    
+    step = 1
+    filtered_lines = []
+    
+    with open(args.log_file, 'r') as stream:
+        for line in stream:
+            if line.startswith(' Maximum Displacement'):
+                filtered_lines.append((step, line, float(line.split()[2])))
+                step += 1
+    
+    for step, line, *_ in sorted(filtered_lines, key=lambda tpl: tpl[-1], reverse=True):
+        print(f'{step:>6}\t{line}', end='')
 
