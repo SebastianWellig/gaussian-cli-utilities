@@ -7,7 +7,6 @@ Collection of my personal CLI commands for manipulating and inspecting Gaussian 
 
 ## Requirements
 
-- Unix-like environment (_e.g._ Linux, macOS, or WSL).
 - Python 3.8 or newer.
 - [Open Babel](https://github.com/openbabel/openbabel) with Python bindings.
 
