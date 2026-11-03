@@ -17,6 +17,12 @@ All commands are standalone files and inside the [bin](bin/) directory of this r
 
 ## Commands
 
+Available commands:
+- [`gmod`](#gmod)
+- [`replcoords`](#replcoords)
+- [`maxdispl`](#maxdispl)
+- [`tseigs`](#tseigs)
+
 ### `gmod`
 
 Distorts coordinates of log file with a vibrational analysis by the i'th normal mode.
