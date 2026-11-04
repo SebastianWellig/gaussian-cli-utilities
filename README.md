@@ -1,5 +1,6 @@
 # Gaussian CLI utilities
 
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg?logo=python&logoColor=white)](https://github.com/terpy-tools/goodsolute/blob/HEAD/pyproject.toml)
 [![Issues](https://img.shields.io/github/issues-raw/SebastianWellig/gaussian-cli-utilities.svg?label=Issues)](https://github.com/SebastianWellig/gaussian-cli-utilities/issues)
 [![License](https://img.shields.io/badge/License-GPLv2-orange.svg)](https://github.com/SebastianWellig/gaussian-cli-utilities/blob/main/LICENSE)
 
